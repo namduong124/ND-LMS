@@ -56,7 +56,6 @@ services:
   - type: web
     name: nd-lms-frontend
     runtime: static
-    plan: free
     rootDir: FE
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
