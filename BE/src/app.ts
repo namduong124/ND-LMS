@@ -26,7 +26,27 @@ const isTest = env.nodeEnv === 'test';
 if (env.trustProxy > 0) app.set('trust proxy', env.trustProxy);
 
 app.use(helmet());
-app.use(cors({ origin: env.clientUrl, credentials: true }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (origin === env.clientUrl || origin.includes('localhost')) {
+        return callback(null, true);
+      }
+      try {
+        const url = new URL(origin);
+        if (url.hostname.endsWith('.onrender.com')) {
+          return callback(null, true);
+        }
+      } catch {
+        // ignore url parsing error
+      }
+      return callback(null, true);
+    },
+    credentials: true
+  })
+);
 app.use(express.json());
 if (!isTest) app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, skip: () => isTest }));

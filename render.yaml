@@ -29,10 +29,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: 1d
       - key: CLIENT_URL
-        fromService:
-          type: web
-          name: nd-lms-frontend
-          property: url
+        value: https://nd-lms-frontend.onrender.com
       # Tích hợp nâng cao (Tùy chọn)
       - key: GEMINI_API_KEY
         sync: false
@@ -60,7 +57,6 @@ services:
     name: nd-lms-frontend
     runtime: static
     plan: free
-    region: singapore
     rootDir: FE
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
@@ -79,7 +75,4 @@ services:
         value: nosniff
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: nd-lms-backend
-          property: url
+        value: https://nd-lms-backend.onrender.com/api
