@@ -156,7 +156,7 @@ export const submissionService = {
       title: 'Bài tập đã được chấm điểm',
       message: `Bài tập của bạn đã được chấm: ${input.score} điểm.`,
       type: 'GRADE',
-      link: `/courses/${submission.classId}?tab=gradebook`,
+      link: `/classes/${submission.classId}?tab=gradebook`,
     }).catch(() => {});
 
     return submission;

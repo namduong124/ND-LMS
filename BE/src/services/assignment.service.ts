@@ -69,7 +69,7 @@ export const assignmentService = {
               title: `Bài tập mới: ${assignment.title}`,
               message: `Lớp ${targetClass.name} vừa có bài tập mới. Hạn nộp: ${deadlineDate.toLocaleDateString('vi-VN')}`,
               type: 'ASSIGNMENT',
-              link: `/courses/${targetClass._id}?tab=assignments`,
+              link: `/classes/${targetClass._id}?tab=assignments`,
             })
           );
           await Promise.all(promises);
@@ -258,7 +258,7 @@ export const assignmentService = {
                 title: `Gia hạn bài tập: ${assignment.title}`,
                 message: `Hạn nộp bài tập "${assignment.title}" đã được điều chỉnh đến ${assignment.deadlineAt.toLocaleString('vi-VN')}.`,
                 type: 'ASSIGNMENT',
-                link: `/courses/${assignment.classId}?tab=assignments`,
+                link: `/classes/${assignment.classId}?tab=assignments`,
               })
             )
           );

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ScheduleItem } from '../types/schedule.types';
 import { TimetableWeeklyGrid } from './TimetableWeeklyGrid';
 
@@ -63,6 +63,14 @@ const sampleSchedules: ScheduleItem[] = ([
 ] as unknown) as ScheduleItem[];
 
 describe('TimetableWeeklyGrid', () => {
+  beforeEach(() => {
+    vi.spyOn(Date.prototype, 'getDay').mockReturnValue(1);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('renders 7 days weekly grid columns', () => {
     render(<TimetableWeeklyGrid schedules={sampleSchedules} />);
 

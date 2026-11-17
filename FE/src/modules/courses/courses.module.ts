@@ -11,6 +11,7 @@ export const coursesModule: AppModule = {
     { path: '/classes', Component: ClassesListPage },
     { path: '/teacher/classes', Component: ClassesListPage, roles: ['teacher', 'admin'] },
     { path: '/classes/:id', Component: ClassDetailPage },
+    { path: '/courses/:id', Component: ClassDetailPage },
     { path: '/courses/registration', Component: CourseRegistrationPage, roles: ['student', 'admin', 'user'] },
     { path: '/timetable', Component: TimetablePage }
   ],

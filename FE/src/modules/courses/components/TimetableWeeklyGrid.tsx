@@ -7,7 +7,8 @@ import {
   Copy,
   Check,
   ExternalLink,
-  Info
+  Info,
+  FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
@@ -188,6 +189,20 @@ export const TimetableWeeklyGrid = ({ schedules, isLoading }: TimetableWeeklyGri
 
             {/* Right Action Buttons */}
             <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0 justify-center">
+              {selectedSchedule.classId?._id && (
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="border-border hover:bg-muted text-foreground text-xs gap-1.5"
+                >
+                  <a href={`/classes/${selectedSchedule.classId._id}?tab=assignments`}>
+                    <FileText className="size-3.5 text-primary" />
+                    <span>Xem bài tập & lớp học</span>
+                  </a>
+                </Button>
+              )}
+
               <Button
                 variant="outline"
                 size="sm"

@@ -79,12 +79,10 @@ export const NotificationDetailDialog = ({
     if (notification.link.startsWith('http')) {
       window.open(notification.link, '_blank');
     } else {
-      try {
-        window.history.pushState({}, '', notification.link);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      } catch {
-        window.location.href = notification.link;
-      }
+      const targetLink = notification.link.startsWith('/courses/')
+        ? notification.link.replace(/^\/courses\//, '/classes/')
+        : notification.link;
+      window.location.href = targetLink;
     }
   };
 

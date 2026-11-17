@@ -51,7 +51,7 @@ export const closeOverdueAssignments = async (): Promise<number> => {
                   title: 'Hết hạn nộp bài tập',
                   message: `Bài tập "${a.title}" đã chính thức hết hạn nộp và tự động khóa nhận bài.`,
                   type: 'ASSIGNMENT',
-                  link: `/courses/${a.classId}?tab=assignments`
+                  link: `/classes/${a.classId}?tab=assignments`
                 })
               )
             );
@@ -113,7 +113,7 @@ export const closeEndedClasses = async (): Promise<number> => {
                   title: 'Lớp học kết thúc',
                   message: `Lớp học "${c.name}" đã hoàn thành thời gian đào tạo theo kế hoạch.`,
                   type: 'SYSTEM',
-                  link: `/courses/${c._id}`
+                  link: `/classes/${c._id}`
                 })
               )
             );

@@ -85,12 +85,7 @@ export const ScheduleDetailDialog = ({
   const handleGoToClass = () => {
     if (classIdStr) {
       onOpenChange(false);
-      try {
-        window.history.pushState({}, '', `/courses/${classIdStr}`);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      } catch {
-        window.location.href = `/courses/${classIdStr}`;
-      }
+      window.location.href = `/classes/${classIdStr}`;
     }
   };
 
