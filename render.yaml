@@ -1,0 +1,85 @@
+# Render Blueprint Specification (https://render.com/docs/blueprint-spec)
+# Infrastructure as Code (IaC) for ND LMS (Full-stack Monorepo)
+
+services:
+  # ========================================================
+  # 1. BACKEND SERVICE (Node.js + Express 5 + Socket.io)
+  # ========================================================
+  - type: web
+    name: nd-lms-backend
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: BE
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: TRUST_PROXY
+        value: 1
+      - key: MONGO_URI
+        sync: false # Nhập chuỗi kết nối MongoDB Atlas của bạn trên Render Dashboard
+      - key: JWT_SECRET
+        generateValue: true # Render tự động sinh chuỗi bảo mật ngẫu nhiên > 32 ký tự
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: CLIENT_URL
+        fromService:
+          type: web
+          name: nd-lms-frontend
+          property: url
+      # Tích hợp nâng cao (Tùy chọn)
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: EMAIL_FROM
+        value: no-reply@nd-lms.edu.vn
+
+  # ========================================================
+  # 2. FRONTEND STATIC SITE (React 19 + Vite + Tailwind CSS)
+  # ========================================================
+  - type: web
+    name: nd-lms-frontend
+    runtime: static
+    plan: free
+    region: singapore
+    rootDir: FE
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    autoDeploy: true
+    routes:
+      # Single Page Application (SPA) client-side rewrite - chống lỗi 404 khi F5
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: nd-lms-backend
+          property: url
