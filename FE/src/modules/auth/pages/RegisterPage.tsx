@@ -33,7 +33,12 @@ export const RegisterPage = () => {
   const onRegisterSubmit = handleSubmit(async (values) => {
     setLoading(true);
     try {
-      await authApi.register({ email: values.email, password: values.password });
+      const res = await authApi.register({ email: values.email, password: values.password });
+      if ((res as unknown as { autoVerified?: boolean })?.autoVerified) {
+        toast.success('Đăng ký tài khoản thành công! Bạn có thể đăng nhập ngay.');
+        navigate('/login');
+        return;
+      }
       setEmail(values.email);
       setStep('verify');
       toast.success('Mã OTP xác thực đã được gửi tới email của bạn.');

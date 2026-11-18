@@ -15,7 +15,10 @@ const transporter = isSmtpConfigured
       host: env.smtpHost,
       port: env.smtpPort,
       secure: env.smtpSecure,
-      auth: { user: env.smtpUser, pass: env.smtpPass }
+      auth: { user: env.smtpUser, pass: env.smtpPass },
+      connectionTimeout: 4000,
+      greetingTimeout: 4000,
+      socketTimeout: 4000
     })
   : nodemailer.createTransport({ jsonTransport: true });
 

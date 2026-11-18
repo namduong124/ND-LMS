@@ -20,7 +20,17 @@ export const createUserWithOtp = async (email: string, password: string) => {
     otpExpiresAt: otpExpiry()
   });
 
-  await sendOtpEmail(email, otp);
+  try {
+    await sendOtpEmail(email, otp);
+  } catch (error) {
+    // If SMTP is blocked or fails (e.g. Render Free Tier blocks outbound port 587)
+    // auto-verify the account so the user is never locked out of the app.
+    console.warn(`[Email Service] Failed to send OTP to ${email} (outbound SMTP may be blocked on Free Tier):`, error);
+    user.isEmailVerified = true;
+    user.otpCode = undefined;
+    user.otpExpiresAt = undefined;
+    await user.save();
+  }
   return user;
 };
 

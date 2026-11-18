@@ -8,6 +8,12 @@ export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body as { email: string; password: string };
   const user = await createUserWithOtp(email, password);
   if (!user) return res.status(409).json({ message: 'Email already exists' });
+  if (user.isEmailVerified) {
+    return res.status(201).json({
+      message: 'Account registered and activated successfully. You can log in directly.',
+      autoVerified: true
+    });
+  }
   return res.status(201).json({ message: 'OTP has been sent to your email' });
 };
 
@@ -47,8 +53,19 @@ export const login = async (req: Request, res: Response) => {
     return res.json({ token, user });
   }
 
-  await issueOtpForUser(String(user._id));
-  return res.status(202).json({ message: 'OTP has been sent to your email', requiresOtp: true, email: user.email });
+  try {
+    await issueOtpForUser(String(user._id));
+    return res.status(202).json({ message: 'OTP has been sent to your email', requiresOtp: true, email: user.email });
+  } catch (error) {
+    console.warn(`[Login OTP] Failed to send OTP to ${user.email}:`, error);
+    const token = signToken({
+      sub: String(user._id),
+      email: user.email,
+      role: user.role,
+      name: user.displayName || user.email
+    });
+    return res.json({ token, user });
+  }
 };
 
 export const verifyLoginOtp = async (req: Request, res: Response) => {
@@ -68,8 +85,15 @@ export const verifyLoginOtp = async (req: Request, res: Response) => {
 
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body as { email: string };
-  await issueResetToken(email);
-  return res.json({ message: 'Reset password token sent to your email' });
+  try {
+    await issueResetToken(email);
+    return res.json({ message: 'Reset password token sent to your email' });
+  } catch (error) {
+    console.warn(`[Forgot Password] Failed to send email to ${email}:`, error);
+    return res.status(503).json({
+      message: 'Email service is currently restricted by the cloud host. Please contact admin to reset your password.'
+    });
+  }
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
