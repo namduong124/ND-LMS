@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -23,12 +23,37 @@ type FormValues = z.infer<typeof registerSchema>;
 export const RegisterPage = () => {
   const [step, setStep] = useState<'register' | 'verify'>('register');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(registerSchema),
   });
   const navigate = useNavigate();
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || !email || !password) return;
+    setLoading(true);
+    try {
+      await authApi.register({ email, password });
+      setResendCooldown(60);
+      toast.success('Mã OTP mới (hiệu lực 30 phút) đã được gửi lại vào email của bạn.');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Không thể gửi lại mã OTP.'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onRegisterSubmit = handleSubmit(async (values) => {
     setLoading(true);
@@ -40,8 +65,10 @@ export const RegisterPage = () => {
         return;
       }
       setEmail(values.email);
+      setPassword(values.password);
+      setResendCooldown(60);
       setStep('verify');
-      toast.success('Mã OTP xác thực đã được gửi tới email của bạn.');
+      toast.success('Mã OTP xác thực đã được gửi tới email của bạn (hiệu lực 30 phút).');
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Đăng ký không thành công.'));
     } finally {
@@ -80,17 +107,30 @@ export const RegisterPage = () => {
         <CardContent>
           <form className="space-y-5" onSubmit={onVerifySubmit}>
             <OtpInput value={otp} onChange={setOtp} />
+            <p className="text-xs text-center text-muted-foreground">
+              Mã xác thực có hiệu lực trong <strong className="text-foreground">30 phút</strong>.
+            </p>
             <Button className="w-full font-semibold shadow-md shadow-primary/20" type="submit" disabled={otp.length !== 6 || loading}>
               {loading && <Loader2 className="size-4 animate-spin" />}
               Xác nhận và Hoàn tất
             </Button>
-            <button
-              type="button"
-              onClick={() => { setStep('register'); setOtp(''); }}
-              className="block w-full text-center text-sm text-muted-foreground transition hover:text-foreground"
-            >
-              Quay lại đăng ký
-            </button>
+            <div className="flex items-center justify-between text-xs pt-1">
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={loading || resendCooldown > 0}
+                className="text-primary font-medium hover:underline disabled:opacity-50 disabled:no-underline"
+              >
+                {resendCooldown > 0 ? `Gửi lại mã (${resendCooldown}s)` : 'Gửi lại mã OTP'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setStep('register'); setOtp(''); }}
+                className="text-muted-foreground hover:text-foreground transition"
+              >
+                Đổi thông tin đăng ký
+              </button>
+            </div>
           </form>
         </CardContent>
       </Card>

@@ -30,6 +30,10 @@ services:
         value: 1d
       - key: CLIENT_URL
         value: https://nd-lms-frontend.onrender.com
+      - key: OTP_EXPIRES_MINUTES
+        value: 30
+      - key: RESET_TOKEN_EXPIRES_MINUTES
+        value: 30
       # Tích hợp nâng cao (Tùy chọn)
       - key: GEMINI_API_KEY
         sync: false
