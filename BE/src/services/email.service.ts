@@ -26,13 +26,33 @@ if (!isEmailConfigured && env.nodeEnv === 'production') {
   console.warn('Warning: Neither BREVO_API_KEY, RESEND_API_KEY, nor SMTP_HOST is set.');
 }
 
+let cachedBrevoSender: string | undefined;
+
+const getBrevoSender = async (): Promise<string> => {
+  if (cachedBrevoSender) return cachedBrevoSender;
+  try {
+    const res = await fetch('https://api.brevo.com/v3/senders', {
+      headers: {
+        accept: 'application/json',
+        'api-key': env.brevoApiKey!
+      }
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { senders?: Array<{ email: string; active: boolean }> };
+      const activeSender = data.senders?.find((s) => s.active);
+      if (activeSender?.email) {
+        cachedBrevoSender = activeSender.email;
+        return activeSender.email;
+      }
+    }
+  } catch (err) {
+    console.warn('Could not auto-fetch Brevo sender:', err);
+  }
+  return env.emailFrom || 'namduongn306@gmail.com';
+};
+
 const sendViaBrevo = async (to: string, subject: string, html: string) => {
-  const senderEmail =
-    env.smtpUser && env.smtpUser.includes('@')
-      ? env.smtpUser
-      : env.emailFrom && !env.emailFrom.includes('example.com') && !env.emailFrom.includes('nd-lms.edu.vn')
-      ? env.emailFrom
-      : 'namduongfw001@gmail.com';
+  const senderEmail = await getBrevoSender();
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
