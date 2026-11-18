@@ -27,7 +27,12 @@ if (!isEmailConfigured && env.nodeEnv === 'production') {
 }
 
 const sendViaBrevo = async (to: string, subject: string, html: string) => {
-  const senderEmail = env.emailFrom?.includes('@') ? env.emailFrom : 'namduongfw001@gmail.com';
+  const senderEmail =
+    env.smtpUser && env.smtpUser.includes('@')
+      ? env.smtpUser
+      : env.emailFrom && !env.emailFrom.includes('example.com') && !env.emailFrom.includes('nd-lms.edu.vn')
+      ? env.emailFrom
+      : 'namduongfw001@gmail.com';
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {

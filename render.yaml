@@ -54,7 +54,7 @@ services:
       - key: SMTP_PASS
         sync: false
       - key: EMAIL_FROM
-        value: no-reply@nd-lms.edu.vn
+        value: namduongfw001@gmail.com
 
   # ========================================================
   # 2. FRONTEND STATIC SITE (React 19 + Vite + Tailwind CSS)
