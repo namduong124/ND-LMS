@@ -185,7 +185,7 @@ export const AdminCoursesClassesPage = () => {
         <div className="flex items-center gap-2 flex-wrap">
           <CreateDepartmentDialog />
           <CreateCourseDialog />
-          <CreateClassDialog />
+          <CreateClassDialog courses={courses} teachers={teachers} />
         </div>
       </div>
 

@@ -15,6 +15,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { coursesApi } from '../api/courses.api';
 import { departmentsApi } from '../api/departments.api';
+import { adminApi } from '@/modules/admin/api/admin.api';
 import type { Course } from '../types/course.types';
 import type { Department } from '../types/department.types';
 
@@ -79,12 +80,26 @@ export const CreateClassDialog = ({
       if (!initialCourses || initialCourses.length === 0) {
         coursesApi.listCourses({ limit: 100 }).then((res) => setCourses(res.items || []));
       }
+      if (!initialTeachers || initialTeachers.length === 0) {
+        adminApi
+          .listUsers({ role: 'teacher', limit: 100 })
+          .then((res) => {
+            setTeachers(
+              (res.items || []).map((u) => ({
+                _id: u._id,
+                displayName: u.displayName,
+                email: u.email
+              }))
+            );
+          })
+          .catch(() => setTeachers([]));
+      }
       departmentsApi
         .listDepartments({ status: 'ACTIVE', limit: 100 })
         .then((res) => setDepartments(res.items || []))
         .catch(() => setDepartments([]));
     }
-  }, [open, initialCourses]);
+  }, [open, initialCourses, initialTeachers]);
 
   const onSubmit = async (data: CreateClassFormData) => {
     try {
@@ -189,7 +204,7 @@ export const CreateClassDialog = ({
                 <option value="">-- Chọn giảng viên --</option>
                 {teachers.map((t) => (
                   <option key={t._id} value={t._id}>
-                    {t.displayName || t.email}
+                    {t.displayName ? `${t.displayName} (${t.email})` : t.email}
                   </option>
                 ))}
               </select>

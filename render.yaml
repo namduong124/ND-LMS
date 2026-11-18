@@ -39,6 +39,12 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+      # Transactional Email APIs (Port 443 HTTPS - Hoạt động 100% trên Render Free)
+      - key: BREVO_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      # Traditional SMTP (Tùy chọn)
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT

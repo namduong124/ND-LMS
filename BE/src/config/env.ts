@@ -20,6 +20,8 @@ const envSchema = z
     // Number of reverse proxies in front of the app (Render, Railway, Nginx: usually 1).
     // Needed so rate limits see the real client IP instead of the proxy's.
     TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+    BREVO_API_KEY: optionalString,
+    RESEND_API_KEY: optionalString,
     SMTP_HOST: optionalString,
     SMTP_PORT: z.coerce.number().int().positive().default(587),
     SMTP_SECURE: z.string().optional().transform((value) => value === 'true'),
@@ -65,6 +67,8 @@ export const parseEnv = (raw: RawEnv) => {
     jwtExpiresIn: v.JWT_EXPIRES_IN,
     clientUrl: v.CLIENT_URL,
     trustProxy: v.TRUST_PROXY,
+    brevoApiKey: v.BREVO_API_KEY,
+    resendApiKey: v.RESEND_API_KEY,
     smtpHost: v.SMTP_HOST,
     smtpPort: v.SMTP_PORT,
     smtpSecure: v.SMTP_SECURE,
