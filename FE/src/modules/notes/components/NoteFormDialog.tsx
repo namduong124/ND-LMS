@@ -8,6 +8,7 @@ import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -72,6 +73,9 @@ export const NoteFormDialog = ({ open, onOpenChange, note }: NoteFormDialogProps
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{note ? 'Edit note' : 'New note'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {note ? 'Edit existing note' : 'Create new note'}
+          </DialogDescription>
         </DialogHeader>
 
         {/* `.catch` keeps a failed request from becoming an unhandled rejection; the toast already explains it. */}
